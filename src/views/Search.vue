@@ -1,7 +1,7 @@
 <template>
     <div class="form">
         <div class="input-container">
-            <input type="text" placeholder="Rašyk čia..." :value="query" @input="parseSearch">
+            <input type="text" placeholder="Rašykite čia..." :value="query" @input="parseSearch">
         </div>
         <list :songs="songs"/>
     </div>

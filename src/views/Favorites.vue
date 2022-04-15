@@ -35,7 +35,7 @@
                         'text-align': 'center',
                     },
                 },
-                'Tuščia. Pridėkite prie mėgstamų paspausdami žvigždutę',
+                'Tuščia. Pridėkite prie mėgstamų paspausdami žvaigždutę',
             );
         },
     };
