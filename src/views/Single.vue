@@ -11,7 +11,7 @@
                 @click="toggleFavorite"
             >
                 <svg class="icon">
-                    <use :xlink:href="song.favorited ? '#icon-star-full' : '#icon-star-empty'"></use>
+                    <use :href="song.favorited ? '#icon-star-full' : '#icon-star-empty'"></use>
                 </svg>
             </button>
         </div>
@@ -19,8 +19,8 @@
             <em>{{ song.verse }}</em>
         </p>
 
-        <audio v-if="audioExist" id="audio" ref="audio"  preload="metadata"  controls  >
-            <source  :src="'https://adventistai.lt/giesmes/' + songId + '.mp3'" type="audio/mpeg" @error="audioError">
+        <audio v-show="song.audio === 1" id="audio" ref="audio"  preload="metadata"  controls  >
+            <source  :src="'https://adventistai.lt/giesmes/' + songId + '.mp3'" type="audio/mpeg" @error="audioError" @durationchange="test">
             Naršyklė nepalaiko audio elementų.
         </audio>
 
@@ -73,7 +73,11 @@ export default {
             .catch(err => Sentry && Sentry.captureException(err));
     },
     methods: {
-        audioError() {
+        test(event) {
+            console.log("test test test ", event)
+        },
+        audioError(event) {
+            console.log('got error: ', event)
             this.audioExist = false;
         },
         toggleFavorite() {
