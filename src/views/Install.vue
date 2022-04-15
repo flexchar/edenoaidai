@@ -7,6 +7,7 @@
     </div>
 </template>
 
+<!--"https://adventistai.lt/edeno-aidai.json"-->
 <script>
     const SONGS_JSON = process.env.VUE_APP_DB_URL || null;
 
@@ -26,11 +27,14 @@
             },
         },
         async beforeMount() {
-            if ((await this.$songs.count()) === 0)
-                this.fetchSongs().then(songs => {
-                    if (this.importSongs(songs)) this.success();
-                });
-            else this.success();
+            // if ((await this.$songs.count()) === 0)
+            //     this.fetchSongs().then(songs => {
+            //         if (this.importSongs(songs)) this.success();
+            //     });
+            // else this.success();
+            this.fetchSongs().then(songs => {
+                if (this.importSongs(songs)) this.success();
+            });
         },
         methods: {
             /**
