@@ -1,13 +1,20 @@
 <template>
     <div class="list">
         <router-link
-            v-for="{ songId, id, title } in songs"
-            :key="id"
+            v-for="song in songs"
+            :key="song.id"
             class="element"
-            :to="`/song/${songId}`"
+            :to="`/song/${song.songId}`"
         >
-            <span class="element__number">{{ songId }}</span>
-            <p class="element__title">{{ title }}</p>
+            <span class="element__number">{{ song.songId }}</span>
+
+            <p class="element__title">{{ song.title }}</p>
+            <div v-if="song.audio === 1">
+                <svg  class="icon-audio">
+                    <use  :href="'#icon-audio' "></use>
+                </svg>
+            </div>
+
         </router-link>
     </div>
 </template>
@@ -28,7 +35,7 @@
     .element {
         display: grid;
 
-        grid-template-columns: auto 1fr;
+        grid-template-columns: auto auto 1fr;
         align-items: center;
 
         font-size: 16px;
@@ -57,7 +64,9 @@
             background-color: rgba(217, 178, 111, 1);
         }
 
+
         &__title {
+            display:  inline-block;
             text-align: right;
 
             padding: 10px;
@@ -70,5 +79,15 @@
             background-color: beige;
             box-shadow: 2px 5px 10px 0 rgba(0, 0, 0, 0.1);
         }
+    }
+    .icon-audio{
+        display: inline-block;
+        width: 2em;
+        height: 2em;
+        stroke-width: 0;
+        stroke: currentColor;
+        fill: currentColor;
+        padding: 10px;
+        margin: 0;
     }
 </style>
