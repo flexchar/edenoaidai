@@ -11,7 +11,7 @@ function getDatabaseInstance() {
     const database = new Dexie('edenoAidai');
 
     database.version(1).stores({
-        songs: '++id, &songId, *title, verse, body, copyright, favorited',
+        songs: '++id, &songId, *title, verse, body, copyright, favorited, audio',
     });
 
     return database;

@@ -66,19 +66,50 @@
                     status = true;
 
                     const { songId, title, verse, body, copyright } = song;
-                    this.$songs
-                        .put({
-                            songId,
-                            title,
-                            verse,
-                            body,
-                            copyright,
-                            favorited: 0,
-                        })
-                        .catch(error => {
-                            status = false;
-                            this.errorId = Sentry && Sentry.captureException(error);
-                        });
+                    if(this.current === 1 ||
+                        this.current === 2 ||
+                        this.current === 37 ||
+                        this.current === 47 ||
+                        this.current === 53 ||
+                        this.current === 95 ||
+                        this.current === 106 ||
+                        this.current === 109 ||
+                        this.current === 113 ||
+                        this.current === 144 ||
+                        this.current === 153 ||
+                        this.current === 218
+
+                    ){
+                        this.$songs
+                            .put({
+                                songId,
+                                title,
+                                verse,
+                                body,
+                                copyright,
+                                favorited: 0,
+                                audio: 1,
+                            })
+                            .catch(error => {
+                                status = false;
+                                this.errorId = Sentry && Sentry.captureException(error);
+                            });
+                    }else{
+                        this.$songs
+                            .put({
+                                songId,
+                                title,
+                                verse,
+                                body,
+                                copyright,
+                                favorited: 0,
+                                audio: 0,
+                            })
+                            .catch(error => {
+                                status = false;
+                                this.errorId = Sentry && Sentry.captureException(error);
+                            });
+                    }
                 });
 
                 return status;
