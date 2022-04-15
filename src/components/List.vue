@@ -35,7 +35,7 @@
     .element {
         display: grid;
 
-        grid-template-columns: auto auto 1fr;
+        grid-template-columns: auto 1fr auto;
         align-items: center;
 
         font-size: 16px;
@@ -67,7 +67,7 @@
 
         &__title {
             display:  inline-block;
-            text-align: right;
+            text-align: left;
 
             padding: 10px;
             margin: 0;
