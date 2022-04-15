@@ -19,7 +19,8 @@
             <em>{{ song.verse }}</em>
         </p>
 
-        <audio v-show="song.audio === 1" id="audio" ref="audio"  preload="metadata"  controls  >
+<!--        <audio v-show="song.audio === 1" id="audio" ref="audio"  preload="metadata"  controls  >-->
+        <audio v-show="audioExist" id="audio" ref="audio"  preload="metadata"  controls  >
             <source  :src="'https://adventistai.lt/giesmes/' + songId + '.mp3'" type="audio/mpeg" @error="audioError" @durationchange="test">
             Naršyklė nepalaiko audio elementų.
         </audio>
