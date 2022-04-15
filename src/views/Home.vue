@@ -11,8 +11,8 @@
         created() {
             this.$songs
                 .orderBy('id')
-                .offset(Math.round(Math.random() * 100))
-                .limit(10)
+                // .offset(Math.round(Math.random() * 100))
+                // .limit(10)
                 .toArray()
                 .then(songs => {
                     this.songs = songs;
