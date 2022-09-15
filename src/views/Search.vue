@@ -31,7 +31,7 @@
             },
         },
         created() {
-            this.parseSearch = this.debounce(this.parseSearch, 225);
+            this.parseSearch = this.debounce(this.parseSearch, 20);
             this.searchSongs();
         },
         methods: {
@@ -74,7 +74,7 @@
                     this.$songs
                         .where('songId')
                         .startsWith(search)
-                        .limit(6)
+                        .limit(100)
                         .toArray()
                         .then(songs => {
                             this.songs = songs || [];
@@ -84,9 +84,16 @@
                 }
                 this.$songs
                     .filter(song =>
-                        song.title.toLowerCase().includes(search.toLowerCase()),
+                        song.body.toLowerCase()
+                            .replace(/[!–,.:]/g, '')
+                            .replace('  ',' ')
+                            .replace(/[ąęėįšųūž]/g, x => ({'ą':'a', 'ę':'e', 'ė':'e','į':'i', 'š':'s', 'ų':'u', 'ū':'u', 'ž':'z',}[x]))
+                            .includes(search.toLowerCase()
+                                .replace(/[!–,.:]/g, '')
+                                .replace(/[ąęėįšųūž]/g, x => ({'ą':'a', 'ę':'e', 'ė':'e','į':'i', 'š':'s', 'ų':'u', 'ū':'u', 'ž':'z',}[x]))),
+
                     )
-                    .limit(6)
+                    .limit(300)
                     .toArray()
                     .then(songs => {
                         this.songs = songs || [];
