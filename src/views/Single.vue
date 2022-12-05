@@ -32,8 +32,9 @@
         </div>
 
         <div class="song-image">
-            <img id="notes" :src="'https://adventistai.lt/giesmes/' + songId + '.jpg'" alt="" >
-            <img id="notes_1" :src="'https://adventistai.lt/giesmes/' + songId + '_1.jpg'" alt="" >
+            <img id="notes" :src="'https://adventistai.lt/giesmes/notes/' + songId + '.jpg'" alt="" >
+            <img id="notes_1" :src="'https://adventistai.lt/giesmes/notes/' + songId + '_1.jpg'" alt="" >
+            <img id="notes_2" :src="'https://adventistai.lt/giesmes/notes/' + songId + '_2.jpg'" alt="" >
         </div>
 
         <small class="song__copyright" v-html="song.copyright"></small>
