@@ -27,14 +27,17 @@
             </audio>
         </div>
 
-
-        <div class="song__body" :style="fontSizeStyle" v-html="song.body"></div>
+        <div style="text-align: center;">
+            <div class="song__body" :style="fontSizeStyle" v-html="song.body"></div>
+        </div>
 
         <div class="song-image">
             <img id="notes" :src="'https://adventistai.lt/giesmes/' + songId + '.jpg'" alt=""  width="auto" height="auto">
             <img id="notes_1" :src="'https://adventistai.lt/giesmes/' + songId + '_1.jpg'" alt=""  width="auto" height="auto">
         </div>
+
         <small class="song__copyright" v-html="song.copyright"></small>
+
     </div>
 </template>
 
@@ -118,8 +121,9 @@ export default {
 }
 .song-image{
     justify-content: center;
-    display: flex;
+    display: grid;
     margin: 20px
+
 }
 .song {
     &__title {
@@ -137,7 +141,9 @@ export default {
         margin-bottom: 20px;
     }
     &__body {
-        text-align: center;
+        display: inline-block;
+        text-align: left;
+        alignment: center;
         font-size: 16px;
         margin-bottom: 20px;
     }
