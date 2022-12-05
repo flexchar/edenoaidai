@@ -32,8 +32,8 @@
         </div>
 
         <div class="song-image">
-            <img id="notes" :src="'https://adventistai.lt/giesmes/' + songId + '.jpg'" alt=""  width="auto" height="auto">
-            <img id="notes_1" :src="'https://adventistai.lt/giesmes/' + songId + '_1.jpg'" alt=""  width="auto" height="auto">
+            <img id="notes" :src="'https://adventistai.lt/giesmes/' + songId + '.jpg'" alt="" >
+            <img id="notes_1" :src="'https://adventistai.lt/giesmes/' + songId + '_1.jpg'" alt="" >
         </div>
 
         <small class="song__copyright" v-html="song.copyright"></small>
@@ -123,8 +123,14 @@ export default {
     justify-content: center;
     display: grid;
     margin: 20px
-
 }
+
+.song-image img{
+    max-width: 100%;
+    width: auto;
+    height: auto;
+}
+
 .song {
     &__title {
         font-size: 20px;
