@@ -20,12 +20,20 @@
         </p>
 
 <!--        <audio v-show="song.audio === 1" id="audio" ref="audio"  preload="metadata"  controls  >-->
-        <audio v-show="audioExist" id="audio" ref="audio"  preload="metadata"  controls  >
-            <source  :src="'https://adventistai.lt/giesmes/' + songId + '.mp3'" type="audio/mpeg" @error="audioError" @durationchange="test">
-            Naršyklė nepalaiko audio elementų.
-        </audio>
+        <div class="audio-player">
+            <audio  v-show="audioExist" id="audio" ref="audio"  preload="metadata"  controls>
+                <source  :src="'https://adventistai.lt/giesmes/' + songId + '.mp3'" type="audio/mpeg" @error="audioError" @durationchange="test">
+                Naršyklė nepalaiko audio elementų.
+            </audio>
+        </div>
+
 
         <div class="song__body" :style="fontSizeStyle" v-html="song.body"></div>
+
+        <div class="song-image">
+            <img id="notes" :src="'https://adventistai.lt/giesmes/' + songId + '.jpg'" alt=""  width="auto" height="auto">
+            <img id="notes_1" :src="'https://adventistai.lt/giesmes/' + songId + '_1.jpg'" alt=""  width="auto" height="auto">
+        </div>
         <small class="song__copyright" v-html="song.copyright"></small>
     </div>
 </template>
@@ -103,9 +111,20 @@ export default {
 </script>
 
 <style lang="scss">
+.audio-player {
+    justify-content: center;
+    display: flex;
+    margin: 20px;
+}
+.song-image{
+    justify-content: center;
+    display: flex;
+    margin: 20px
+}
 .song {
     &__title {
         font-size: 20px;
+        text-align: center;
         width: auto;
         margin: 0;
         margin-bottom: 10px;
@@ -113,14 +132,18 @@ export default {
     }
     &__verse {
         font-size: 16px;
+        text-align: center;
         margin: 0;
         margin-bottom: 20px;
     }
     &__body {
+        text-align: center;
         font-size: 16px;
         margin-bottom: 20px;
     }
     &__buttons {
+        justify-content: center;
+        align-items: center;
         display: flex;
         padding: 10px 0;
         > :not(:last-child) {
@@ -147,6 +170,11 @@ export default {
         font-size: 16px;
         line-height: 1.5;
         @extend %button-shadow;
+    }
+    &__copyright {
+        text-align: center;
+        justify-content: center;
+        display: flex;
     }
 }
 </style>
