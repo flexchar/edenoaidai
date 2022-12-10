@@ -22,7 +22,7 @@ export default {
             total: 0,
             current: 0,
             errorId: '',
-            recordings: [1, 2, 4, 7, 11, 13, 17, 31, 37, 47, 53, 62, 65, 72, 78, 86, 94, 95, 100, 106, 109, 113, 114, 121, 122, 125, 144, 150, 153, 161, 168, 177, 187, 195, 218, 219],
+            recordings: [1, 2, 3, 4, 7, 11, 13, 17, 31, 37, 47, 53, 62, 65, 72, 78, 86, 94, 95, 100, 106, 109, 113, 114, 121, 122, 125, 144, 150, 153, 161, 168, 177, 187, 195, 218, 219],
         };
     },
     computed: {
@@ -31,7 +31,7 @@ export default {
         },
     },
     async beforeMount() {
-        if ((await this.$songs.count()) === 0) {
+        // if ((await this.$songs.count()) === 0) {
 
 
             this.fetchSongs().then(songs => {
@@ -40,7 +40,8 @@ export default {
             // this.fetchAudio().then(songs => {
             //     if (this.importSongs(songs)) this.success();
             // });
-        } else this.success();
+
+        // } else this.success();
     },
     methods: {
         /**
@@ -92,7 +93,7 @@ export default {
             let status = false;
 
             songs.forEach(song => {
-                this.current += 1; // iterate through whole list
+                this.current += 1; // count the iteration
                 this.audio = 0; // an icon indicating audio existence
                 status = true;
 
