@@ -121,12 +121,15 @@ export default {
     margin: 20px;
 }
 .song-image{
+    transform: unset !important;
     justify-content: center;
     display: grid;
     margin: 20px
 }
 
 .song-image img{
+    transform: translate3d(0px, 0px, 0px);
+
     max-width: 100%;
     width: auto;
     height: auto;
