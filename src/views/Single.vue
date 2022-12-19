@@ -32,9 +32,9 @@
         </div>
 
         <div class="song-image">
-            <object type="image/svg+xml" :data="'https://adventistai.lt/giesmes/notes/svg/' + songId + '.svg'"></object>
-            <object type="image/svg+xml" :data="'https://adventistai.lt/giesmes/notes/svg/' + songId + '_1.svg'"></object>
-            <object type="image/svg+xml" :data="'https://adventistai.lt/giesmes/notes/svg/' + songId + '_2.svg'"></object>
+            <img id="notes" :src="'https://adventistai.lt/giesmes/notes/' + songId + '.jpg'" alt="" >
+            <img id="notes_1" :src="'https://adventistai.lt/giesmes/notes/' + songId + '_1.jpg'" alt="" >
+            <img id="notes_2" :src="'https://adventistai.lt/giesmes/notes/' + songId + '_2.jpg'" alt="" >
         </div>
 
         <small class="song__copyright" v-html="song.copyright"></small>
@@ -121,15 +121,12 @@ export default {
     margin: 20px;
 }
 .song-image{
-    transform: unset !important;
     justify-content: center;
     display: grid;
     margin: 20px
 }
 
 .song-image img{
-    transform: translate3d(0px, 0px, 0px);
-
     max-width: 100%;
     width: auto;
     height: auto;
