@@ -32,9 +32,9 @@
         </div>
 
         <div class="song-image">
-            <img id="notes" :src="'https://adventistai.lt/giesmes/notes/' + songId + '.jpg'" alt="" >
-            <img id="notes_1" :src="'https://adventistai.lt/giesmes/notes/' + songId + '_1.jpg'" alt="" >
-            <img id="notes_2" :src="'https://adventistai.lt/giesmes/notes/' + songId + '_2.jpg'" alt="" >
+            <img id="notes" :src="'https://adventistai.lt/giesmes/notes/svg/' + songId + '.svg'" alt="" >
+            <img id="notes_1" :src="'https://adventistai.lt/giesmes/notes/svg/' + songId + '_1.svg'" alt="" >
+            <img id="notes_2" :src="'https://adventistai.lt/giesmes/notes/svg/' + songId + '_2.svg'" alt="" >
         </div>
 
         <small class="song__copyright" v-html="song.copyright"></small>
@@ -91,7 +91,7 @@ export default {
         },
         audioError(event) {
             console.log('got error: ', event)
-            this.audioExist = false;
+
         },
         toggleFavorite() {
             this.$songs
