@@ -19,7 +19,7 @@
             <em>{{ song.verse }}</em>
         </p>
 
-<!--        <audio v-show="song.audio === 1" id="audio" ref="audio"  preload="metadata"  controls  >-->
+        <!--        <audio v-show="song.audio === 1" id="audio" ref="audio"  preload="metadata"  controls  >-->
         <div class="audio-player">
             <audio  v-show="audioExist" id="audio" ref="audio"  preload="metadata"  controls>
                 <source  :src="'https://adventistai.lt/giesmes/' + songId + '.mp3'" type="audio/mpeg" @error="audioError" @durationchange="test">
@@ -32,9 +32,15 @@
         </div>
 
         <div class="song-image">
-            <img id="notes" :src="'https://adventistai.lt/giesmes/notes/' + songId + '.jpg'" alt="" >
-            <img id="notes_1" :src="'https://adventistai.lt/giesmes/notes/' + songId + '_1.jpg'" alt="" >
-            <img id="notes_2" :src="'https://adventistai.lt/giesmes/notes/' + songId + '_2.jpg'" alt="" >
+            <template v-if="imageUrl1">
+                <img :src="imageUrl1" alt=""/>
+            </template>
+            <template v-if="imageUrl2">
+                <img :src="imageUrl2" alt=""/>
+            </template>
+            <template v-if="imageUrl3">
+                <img :src="imageUrl3" alt=""/>
+            </template>
         </div>
 
         <small class="song__copyright" v-html="song.copyright"></small>
@@ -57,6 +63,10 @@ export default {
     data() {
         return {
             audioExist: true,
+
+            baseUrl: 'https://adventistai.lt/giesmes/notes/svg/',
+            imageEnding: '.svg',
+
             song: {},
             get fontSize() {
                 return parseInt(localStorage.getItem('fontSize'), 10) || 16;
@@ -73,6 +83,15 @@ export default {
                 fontSize: `${this.fontSize}px`,
             };
         },
+        imageUrl1() {
+            return `${this.baseUrl}/${this.songId}${this.imageEnding}`;
+        },
+        imageUrl2() {
+            return `${this.baseUrl}/${this.songId}${this.imageEnding.replace('.svg', '_1.svg')}`;
+        },
+        imageUrl3() {
+            return `${this.baseUrl}/${this.songId}${this.imageEnding.replace('.svg', '_2.svg')}`;
+        }
     },
 
     created() {
@@ -86,6 +105,8 @@ export default {
             .catch(err => Sentry && Sentry.captureException(err));
     },
     methods: {
+
+
         test(event) {
             console.log("test test test ", event)
         },
@@ -125,11 +146,11 @@ export default {
     display: grid;
     margin: 20px
 }
-
 .song-image img{
     max-width: 100%;
     width: auto;
     height: auto;
+    shape-rendering: crispEdges;
 }
 
 .song {
