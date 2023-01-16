@@ -153,6 +153,7 @@ export default {
     shape-rendering: crispEdges;
     image-rendering: optimizeQuality;
     -webkit-optimize-contrast: auto;
+    object-fit: cover;
 }
 
 .song {
