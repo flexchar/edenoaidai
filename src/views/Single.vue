@@ -151,6 +151,8 @@ export default {
     width: auto;
     height: auto;
     shape-rendering: crispEdges;
+    image-rendering: optimizeQuality;
+    -webkit-optimize-contrast: auto;
 }
 
 .song {
