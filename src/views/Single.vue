@@ -19,30 +19,11 @@
             <em>{{ song.verse }}</em>
         </p>
 
-        <div v-show="song.musicAudio" class="audio-container">
-            <div class="audio-description">
-                <svg class="icon-audio">
-                    <use :href="'#icon-music' "></use>
-                </svg>
-                <span>Melodijos įrašas:</span>
-            </div>
-
-            <audio id="music" ref="music" class="audio-file" preload="metadata" controls>
-                <source :src="musicUrl" type="audio/mpeg">
+        <!--        <audio v-show="song.audio === 1" id="audio" ref="audio"  preload="metadata"  controls  >-->
+        <div class="audio-player">
+            <audio  v-show="audioExist" id="audio" ref="audio"  preload="metadata"  controls>
+                <source  :src="'https://adventistai.lt/giesmes/' + songId + '.mp3'" type="audio/mpeg" @error="audioError" @durationchange="test">
                 Naršyklė nepalaiko audio elementų.
-            </audio>
-        </div>
-
-        <div v-show="song.vocalAudio" class="audio-container">
-            <div class="audio-description">
-                <svg class="icon-audio">
-                    <use :href="'#icon-vocal' "></use>
-                </svg>
-                <span>Giesmės įrašas:</span>
-            </div>
-
-            <audio id="vocal" ref="vocal" class="audio-file" preload="metadata" controls>
-                <source :src="vocalUrl" type="audio/mpeg">
             </audio>
         </div>
 
@@ -51,9 +32,15 @@
         </div>
 
         <div class="song-image">
-            <img :src="imageUrl1" alt=""/>
-            <img :src="imageUrl2" alt=""/>
-            <img :src="imageUrl3" alt=""/>
+            <template v-if="imageUrl1">
+                <img :src="imageUrl1" alt=""/>
+            </template>
+            <template v-if="imageUrl2">
+                <img :src="imageUrl2" alt=""/>
+            </template>
+            <template v-if="imageUrl3">
+                <img :src="imageUrl3" alt=""/>
+            </template>
         </div>
 
         <small class="song__copyright" v-html="song.copyright"></small>
@@ -72,10 +59,13 @@ export default {
         },
     },
 
+
     data() {
         return {
-            baseUrl: 'https://adventistai.lt/giesmes/',
-            imageFormat: 'svg',
+            audioExist: true,
+
+            baseUrl: 'https://adventistai.lt/giesmes/notes/svg/',
+            imageEnding: '.svg',
 
             song: {},
             get fontSize() {
@@ -93,21 +83,15 @@ export default {
                 fontSize: `${this.fontSize}px`,
             };
         },
-        vocalUrl() {
-            return `${this.baseUrl}vocal/${this.songId}.mp3`;
-        },
-        musicUrl() {
-            return `${this.baseUrl}music/${this.songId}.mp3`;
-        },
         imageUrl1() {
-            return `${this.baseUrl}notes/${this.imageFormat}/${this.songId}.${this.imageFormat}`;
+            return `${this.baseUrl}/${this.songId}${this.imageEnding}`;
         },
         imageUrl2() {
-            return `${this.baseUrl}notes/${this.imageFormat}/${this.songId}${this.imageFormat.replace(this.imageFormat, `_1.${this.imageFormat}`)}`;
+            return `${this.baseUrl}/${this.songId}${this.imageEnding.replace('.svg', '_1.svg')}`;
         },
         imageUrl3() {
-            return `${this.baseUrl}notes/${this.imageFormat}/${this.songId}${this.imageFormat.replace(this.imageFormat, `_2.${this.imageFormat}`)}`;
-        },
+            return `${this.baseUrl}/${this.songId}${this.imageEnding.replace('.svg', '_2.svg')}`;
+        }
     },
 
     created() {
@@ -121,6 +105,15 @@ export default {
             .catch(err => Sentry && Sentry.captureException(err));
     },
     methods: {
+
+
+        test(event) {
+            console.log("test test test ", event)
+        },
+        audioError(event) {
+            console.log('got error: ', event)
+
+        },
         toggleFavorite() {
             this.$songs
                 .update(this.song.id, {
@@ -143,39 +136,17 @@ export default {
 </script>
 
 <style lang="scss">
-.icon-audio {
-    width: 2em;
-    height: 2em;
-    stroke-width: 0;
-    stroke: currentColor;
-    fill: currentColor;
-    padding: 10px;
-    margin: 0;
-}
-
-.audio-description {
-    align-items: center;
+.audio-player {
     justify-content: center;
     display: flex;
+    margin: 20px;
 }
-
-.audio-container {
-    text-align: center;
-    display: block;
-}
-
-.audio-file {
-    text-align: center;
-    padding-bottom: 20px;
-}
-
-.song-image {
+.song-image{
     justify-content: center;
     display: grid;
     margin: 20px
 }
-
-.song-image img {
+.song-image img{
     max-width: 100%;
     width: auto;
     height: auto;
@@ -194,14 +165,12 @@ export default {
         margin-bottom: 10px;
         border-bottom: 1px solid black;
     }
-
     &__verse {
         font-size: 16px;
         text-align: center;
         margin: 0;
         margin-bottom: 20px;
     }
-
     &__body {
         display: inline-block;
         text-align: left;
@@ -209,25 +178,21 @@ export default {
         font-size: 16px;
         margin-bottom: 20px;
     }
-
     &__buttons {
         justify-content: center;
         align-items: center;
         display: flex;
         padding: 10px 0;
-
         > :not(:last-child) {
             margin-right: 10px;
         }
     }
-
     %button-shadow {
         border: none;
         border-radius: 20px;
         background-color: white;
         box-shadow: 2px 2px 5px 0 rgba(0, 0, 0, 0.4);
     }
-
     &__favorite-button {
         display: inline-block;
         font-size: 20px;
@@ -238,13 +203,11 @@ export default {
         color: rgba(228, 179, 99, 1);
         @extend %button-shadow;
     }
-
     &__font-size-button {
         font-size: 16px;
         line-height: 1.5;
         @extend %button-shadow;
     }
-
     &__copyright {
         text-align: center;
         justify-content: center;
