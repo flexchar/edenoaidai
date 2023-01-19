@@ -9,10 +9,10 @@
 
 <script>
 const SONGS_JSON = process.env.VUE_APP_DB_URL || null;
-const DETAILS_JSON = "https://adventistai.lt/giesmes/details.json" || null;
 
 // const SONGS_JSON = process.env.VUE_APP_DB_URL || null;
 // const SONGS_JSON = "https://adventistai.lt/edeno-aidai.json" || null;
+// const AUDIO_JSON = "https://adventistai.lt/giesmes/recordings.json" || null;
 
 export default {
     data() {
@@ -22,8 +22,7 @@ export default {
             total: 0,
             current: 0,
             errorId: '',
-            music: [],
-            vocal: [],
+            recordings: [1, 2, 3, 4, 7, 11, 13, 17, 21, 24, 31, 37, 38, 43, 47, 49, 50, 53, 59, 62, 65, 72, 78, 86, 90, 92, 94, 95, 100, 102, 103, 104, 106, 109, 113, 114, 121, 122, 125, 130, 144, 150, 153, 161, 163, 164, 165, 167, 168, 173, 176, 177, 179, 186, 187, 189, 195, 201, 204, 218, 219, 237, 246, 249],
         };
     },
     computed: {
@@ -32,21 +31,17 @@ export default {
         },
     },
     async beforeMount() {
-        this.fetchSongs().then(songs => {
-            if (this.importSongs(songs)) this.success();
-        });
-    },
-    created() {
-        fetch(DETAILS_JSON)
-            .then(response => response.json())
-            .then(data => {
-                this.music = data[0].music;
-                this.vocal = data[1].vocal;
-            })
+        // if ((await this.$songs.count()) === 0) {
 
-            .catch(error => {
-                console.error(error);
+
+            this.fetchSongs().then(songs => {
+                if (this.importSongs(songs)) this.success();
             });
+            // this.fetchAudio().then(songs => {
+            //     if (this.importSongs(songs)) this.success();
+            // });
+
+        // } else this.success();
     },
     methods: {
         /**
@@ -59,6 +54,13 @@ export default {
                 return false;
             }
 
+            /*                 if (AUDIO_JSON === null) {
+                                this.message = 'URL for audio recordings is missing.';
+                                // return false;
+                            } */
+
+            // this.fetchAudio();
+
             return fetch(SONGS_JSON)
                 .then(res => res.json())
                 .catch(err => {
@@ -66,6 +68,19 @@ export default {
                     this.message = `Įvyko klaida...`;
                 });
         },
+
+/*         fetchAudio() {
+            if (AUDIO_JSON === null) {
+                this.message = 'URL for audio recordings is missing.';
+                return false;
+            }
+            return fetch(AUDIO_JSON)
+                .then(res => res.json())
+                .catch(err => {
+                    this.errorId = Sentry && Sentry.captureException(err);
+                    this.message = `Įvyko klaida...`;
+                });
+        }, */
 
         /**
          * Load songs from array into browser database using Dexie API
@@ -79,13 +94,11 @@ export default {
 
             songs.forEach(song => {
                 this.current += 1; // count the iteration
-                this.musicAudio = 0; // an icon indicating music audio file existence
-                this.vocalAudio = 0; // an icon indicating vocal audio file existance
+                this.audio = 0; // an icon indicating audio existence
                 status = true;
 
-                const {songId, title, verse, body, copyright,} = song;
-                if (this.music.includes(this.current)) this.musicAudio = 1; // check if current song iteration should have an audio icon
-                if (this.vocal.includes(this.current)) this.vocalAudio = 1;
+                const {songId, title, verse, body, copyright} = song;
+                if (this.recordings.includes(this.current)) this.audio = 1; // check if current song iteration should have an audio icon
 
                 this.$songs
                     .put({
@@ -95,8 +108,7 @@ export default {
                         body,
                         copyright,
                         favorited: 0,
-                        musicAudio: this.musicAudio,
-                        vocalAudio: this.vocalAudio,
+                        audio: this.audio,
                     })
                     .catch(error => {
                         status = false;
