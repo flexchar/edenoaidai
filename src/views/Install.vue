@@ -9,7 +9,7 @@
 
 <script>
 const SONGS_JSON = process.env.VUE_APP_DB_URL || null;
-const DETAILS_JSON = "https://adventistai.lt/giesmes/details.json" || null;
+const DETAILS_JSON = process.env.VUE_APP_DB2_URL || null;
 
 // const SONGS_JSON = process.env.VUE_APP_DB_URL || null;
 // const SONGS_JSON = "https://adventistai.lt/edeno-aidai.json" || null;
