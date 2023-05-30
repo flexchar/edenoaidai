@@ -9,9 +9,10 @@
             <span class="element__number">{{ song.songId }}</span>
 
             <p class="element__title">{{ song.title }}</p>
-            <div v-if="song.audio === 1">
-                <svg  class="icon-audio">
-                    <use  :href="'#icon-audio' "></use>
+
+            <div v-for="(key, index) in song.lists" :key="index">
+                <svg class="icon-list">
+                    <use :href="`#icon-${key}`"></use>
                 </svg>
             </div>
 
