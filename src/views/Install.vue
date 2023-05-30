@@ -70,17 +70,16 @@ export default {
             } catch (error) {
                 throw new Error(`Failed to fetch tracks: ${error.message}`);
             }
-        }
-    },
+        },
 
 
-    /**
-     * Load songs from array into browser database using Dexie API
-     *
-     * @param {Dexie} table Database table
-     * @param {array} songs Array of songs
-     * @param {array} tracks Array of tracks
-     */
+        /**
+         * Load songs from array into browser database using Dexie API
+         *
+         * @param {Dexie} table Database table
+         * @param {array} songs Array of songs
+         * @param {array} tracks Array of tracks
+         */
         async importSongs(songs, tracks) {
             this.total = songs.length;
             let status = false;
@@ -121,7 +120,7 @@ export default {
             this.status = 'ready';
             setTimeout(() => this.$router.push('/'), 1000);
         },
-
+    }
 };
 </script>
 
