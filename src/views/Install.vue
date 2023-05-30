@@ -9,7 +9,7 @@
 
 <script>
 const SONGS_JSON = process.env.VUE_APP_DB_URL || null;
-
+const TRACKS_JSON = process.env.VUE_APP_DB2_URL || null;
 // const SONGS_JSON = process.env.VUE_APP_DB_URL || null;
 // const SONGS_JSON = "https://adventistai.lt/edeno-aidai.json" || null;
 // const AUDIO_JSON = "https://adventistai.lt/giesmes/recordings.json" || null;
@@ -22,7 +22,7 @@ export default {
             total: 0,
             current: 0,
             errorId: '',
-            recordings: [1, 2, 3, 4, 7, 11, 13, 17, 21, 24, 31, 37, 38, 43, 47, 49, 50, 53, 59, 62, 65, 72, 78, 86, 90, 92, 94, 95, 100, 102, 103, 104, 106, 109, 113, 114, 121, 122, 125, 130, 144, 150, 153, 161, 163, 164, 165, 167, 168, 173, 176, 177, 179, 186, 187, 189, 195, 201, 204, 218, 219, 237, 246, 249],
+            tracks:[],
         };
     },
     computed: {
@@ -31,74 +31,72 @@ export default {
         },
     },
     async beforeMount() {
-        // if ((await this.$songs.count()) === 0) {
-
-
-            this.fetchSongs().then(songs => {
-                if (this.importSongs(songs)) this.success();
-            });
-            // this.fetchAudio().then(songs => {
-            //     if (this.importSongs(songs)) this.success();
-            // });
-
-        // } else this.success();
+        try {
+            const songs = await this.fetchSongs();
+            const tracks = await this.fetchTracks();
+            if (await this.importSongs(songs, tracks)) {
+                this.success();
+            }
+        } catch (error) {
+            this.message = `Įvyko klaida: ${error.message}`;
+        }
     },
     methods: {
         /**
          * Fetches songs from JSON API
          *
          */
-        fetchSongs() {
+        async fetchSongs() {
             if (SONGS_JSON === null) {
-                this.message = 'URL for database is missing.';
-                return false;
+                throw new Error('URL for database is missing.');
             }
 
-            /*                 if (AUDIO_JSON === null) {
-                                this.message = 'URL for audio recordings is missing.';
-                                // return false;
-                            } */
-
-            // this.fetchAudio();
-
-            return fetch(SONGS_JSON)
-                .then(res => res.json())
-                .catch(err => {
-                    this.errorId = Sentry && Sentry.captureException(err);
-                    this.message = `Įvyko klaida...`;
-                });
+            try {
+                const response = await fetch(SONGS_JSON);
+                return await response.json();
+            } catch (error) {
+                throw new Error(`Failed to fetch songs: ${error.message}`);
+            }
         },
 
-/*         fetchAudio() {
-            if (AUDIO_JSON === null) {
-                this.message = 'URL for audio recordings is missing.';
-                return false;
+        async fetchTracks() {
+            if (TRACKS_JSON === null) {
+                throw new Error('URL for tracks database is missing.');
             }
-            return fetch(AUDIO_JSON)
-                .then(res => res.json())
-                .catch(err => {
-                    this.errorId = Sentry && Sentry.captureException(err);
-                    this.message = `Įvyko klaida...`;
-                });
-        }, */
 
-        /**
-         * Load songs from array into browser database using Dexie API
-         *
-         * @param {Dexie} table Database table
-         * @param {array} songs Array of songs
-         */
-        importSongs(songs) {
+            try {
+                const response = await fetch(TRACKS_JSON);
+                return await response.json();
+            } catch (error) {
+                throw new Error(`Failed to fetch tracks: ${error.message}`);
+            }
+        }
+    },
+
+
+    /**
+     * Load songs from array into browser database using Dexie API
+     *
+     * @param {Dexie} table Database table
+     * @param {array} songs Array of songs
+     * @param {array} tracks Array of tracks
+     */
+        async importSongs(songs, tracks) {
             this.total = songs.length;
             let status = false;
 
             songs.forEach(song => {
                 this.current += 1; // count the iteration
-                this.audio = 0; // an icon indicating audio existence
                 status = true;
 
                 const {songId, title, verse, body, copyright} = song;
-                if (this.recordings.includes(this.current)) this.audio = 1; // check if current song iteration should have an audio icon
+                const trackLists = tracks.filter(track => track.list.includes(songId));
+                const lists = {};
+
+                trackLists.forEach(track => {
+                    const listName = tracks.find(item => item.tracks.includes(track.number)).name;
+                    lists[listName] = true;
+                });
 
                 this.$songs
                     .put({
@@ -108,13 +106,14 @@ export default {
                         body,
                         copyright,
                         favorited: 0,
-                        audio: this.audio,
+                        lists,
                     })
                     .catch(error => {
                         status = false;
-                        this.errorId = Sentry && Sentry.captureException(error);
+                        console.error(error);
                     });
             });
+
             return status;
         },
 
@@ -122,7 +121,7 @@ export default {
             this.status = 'ready';
             setTimeout(() => this.$router.push('/'), 1000);
         },
-    },
+
 };
 </script>
 
