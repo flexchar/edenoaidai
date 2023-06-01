@@ -19,12 +19,16 @@
             <em>{{ song.verse }}</em>
         </p>
 
-        <!--        <audio v-show="song.audio === 1" id="audio" ref="audio"  preload="metadata"  controls  >-->
-        <div class="audio-player">
-            <audio  v-show="audioExist" id="audio" ref="audio"  preload="metadata"  controls>
-                <source  :src="'https://adventistai.lt/giesmes/' + songId + '.mp3'" type="audio/mpeg" @error="audioError" @durationchange="test">
-                Naršyklė nepalaiko audio elementų.
-            </audio>
+        <div v-for="(key, index) in song.lists" :key="index">
+            <svg class="icon-audio">
+                <use :href="`#icon-${key}`"></use>
+            </svg>
+            <div v-if="index !== undefined" class="audio-player" >
+                <audio v-show="audioExist" :id="'audio-' + index" ref="audio" preload="metadata" controls>
+                    <source :src="'https://adventistai.lt/giesmes/'+ key +'/' + songId + '.mp3'" type="audio/mpeg" @error="audioError">
+                    Naršyklė nepalaiko audio elementų.
+                </audio>
+            </div>
         </div>
 
         <div style="text-align: center;">
@@ -139,7 +143,7 @@ export default {
 .audio-player {
     justify-content: center;
     display: flex;
-    margin: 20px;
+    margin: 10px;
 }
 .song-image{
     justify-content: center;
@@ -212,6 +216,10 @@ export default {
         text-align: center;
         justify-content: center;
         display: flex;
+    }
+    .icon-audio {
+        display: block;
+        margin: 0 auto;
     }
 }
 </style>
