@@ -10,9 +10,6 @@
 <script>
 const SONGS_JSON = process.env.VUE_APP_DB_URL || null;
 const TRACKS_JSON = process.env.VUE_APP_DB2_URL || null;
-// const SONGS_JSON = process.env.VUE_APP_DB_URL || null;
-// const SONGS_JSON = "https://adventistai.lt/edeno-aidai.json" || null;
-// const AUDIO_JSON = "https://adventistai.lt/giesmes/recordings.json" || null;
 
 export default {
     data() {
@@ -22,13 +19,14 @@ export default {
             total: 0,
             current: 0,
             errorId: '',
-            tracks:[],
+            tracks: [],
         };
     },
     computed: {
         progress() {
             return `${this.current}/${this.total}`;
         },
+
     },
     async beforeMount() {
         try {
@@ -41,18 +39,28 @@ export default {
             this.message = `Įvyko klaida: ${error.message}`;
         }
     },
+
     methods: {
+        addNumbers(a, b) {
+            console.log(`Adding ${a} and ${b}`);
+            const result = a + b;
+            console.log(`Result: ${result}`);
+            return result;
+        },
+
         /**
          * Fetches songs from JSON API
          *
          */
         async fetchSongs() {
+            console.log(SONGS_JSON);
             if (SONGS_JSON === null) {
                 throw new Error('URL for database is missing.');
             }
 
             try {
                 const response = await fetch(SONGS_JSON);
+
                 return await response.json();
             } catch (error) {
                 throw new Error(`Failed to fetch songs: ${error.message}`);
@@ -85,16 +93,15 @@ export default {
             let status = false;
 
             songs.forEach(song => {
-                this.current += 1; // count the iteration
                 status = true;
 
                 const {songId, title, verse, body, copyright} = song;
-                const trackLists = tracks.filter(track => track.list.includes(songId));
-                const lists = {};
+                const lists = [];
 
-                trackLists.forEach(track => {
-                    const listName = tracks.find(item => item.tracks.includes(track.number)).name;
-                    lists[listName] = true;
+                tracks.forEach(trackList => {
+                    if (trackList.tracks.includes(song.id)) {
+                        lists.push(trackList.name);
+                    }
                 });
 
                 this.$songs
@@ -111,6 +118,7 @@ export default {
                         status = false;
                         console.error(error);
                     });
+
             });
 
             return status;
