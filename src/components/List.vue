@@ -10,13 +10,16 @@
 
             <p class="element__title">{{ song.title }}</p>
 
-            <div v-for="(key, index) in song.lists" :key="index">
-                <svg class="icon-list">
-                    <use :href="`#icon-${key}`"></use>
-                </svg>
+            <div class="icons">
+                <div  v-for="(key, index) in song.lists" :key="index" >
+                    <svg class="icon-audio">
+                        <use :href="`#icon-${key}`"></use>
+                    </svg>
+                </div>
             </div>
 
         </router-link>
+
     </div>
 </template>
 
@@ -58,9 +61,7 @@
 
             padding: 0 15px;
 
-            border-radius: 99px;
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
+            border-radius: 0 99px 99px 0;
 
             background-color: rgba(217, 178, 111, 1);
         }
@@ -81,14 +82,19 @@
             box-shadow: 2px 5px 10px 0 rgba(0, 0, 0, 0.1);
         }
     }
+    .icons {
+        display:flex;
+    }
     .icon-audio{
-        display: inline-block;
+
         width: 2em;
         height: 2em;
         stroke-width: 0;
         stroke: currentColor;
         fill: currentColor;
-        padding: 10px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+
         margin: 0;
     }
 </style>
