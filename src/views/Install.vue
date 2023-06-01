@@ -41,12 +41,6 @@ export default {
     },
 
     methods: {
-        addNumbers(a, b) {
-            console.log(`Adding ${a} and ${b}`);
-            const result = a + b;
-            console.log(`Result: ${result}`);
-            return result;
-        },
 
         /**
          * Fetches songs from JSON API
@@ -99,7 +93,7 @@ export default {
                 const lists = [];
 
                 tracks.forEach(trackList => {
-                    if (trackList.tracks.includes(song.id)) {
+                    if (trackList.tracks.includes(songId)) {
                         lists.push(trackList.name);
                     }
                 });
