@@ -8,12 +8,9 @@
 </template>
 
 <script>
-const TRACKS_JSON = process.env.VUE_APP_DB2_URL || null;
 const SONGS_JSON = process.env.VUE_APP_DB_URL || null;
-// const TRACKS_JSON = process.env.VUE_APP_DB2_URL || null;
-// const SONGS_JSON = process.env.VUE_APP_DB_URL || null;
-// const SONGS_JSON = "https://adventistai.lt/edeno-aidai.json" || null;
-// const TRACKS_JSON = "https://adventistai.lt/details.json" || null;
+const TRACKS_JSON = process.env.VUE_APP_DB2_URL || null;
+
 export default {
     data() {
         return {
@@ -44,6 +41,13 @@ export default {
     },
 
     methods: {
+        addNumbers(a, b) {
+            console.log(`Adding ${a} and ${b}`);
+            const result = a + b;
+            console.log(`Result: ${result}`);
+            return result;
+        },
+
         /**
          * Fetches songs from JSON API
          *
@@ -95,7 +99,7 @@ export default {
                 const lists = [];
 
                 tracks.forEach(trackList => {
-                    if (trackList.tracks.includes(songId)) {
+                    if (trackList.tracks.includes(song.id)) {
                         lists.push(trackList.name);
                     }
                 });
