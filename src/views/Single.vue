@@ -88,7 +88,7 @@ export default {
             };
         },
         imageUrl1() {
-            return `${this.baseUrl}/${this.songId}${this.imageEnding}`;
+            return `${this.baseUrl}${this.songId}${this.imageEnding}`;
         },
         imageUrl2() {
             return `${this.baseUrl}/${this.songId}${this.imageEnding.replace('.svg', '_1.svg')}`;
@@ -156,7 +156,7 @@ export default {
     height: auto;
     shape-rendering: crispEdges;
     image-rendering: optimizeQuality;
-    -webkit-optimize-contrast: auto;
+
     object-fit: cover;
 }
 
@@ -165,15 +165,13 @@ export default {
         font-size: 20px;
         text-align: center;
         width: auto;
-        margin: 0;
-        margin-bottom: 10px;
+        margin: 0 0 10px;
         border-bottom: 1px solid black;
     }
     &__verse {
         font-size: 16px;
         text-align: center;
-        margin: 0;
-        margin-bottom: 20px;
+        margin: 0 0 20px;
     }
     &__body {
         display: inline-block;
