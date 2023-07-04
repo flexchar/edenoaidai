@@ -3,7 +3,9 @@
     <div v-if="song" class="song">
         <h2 class="song__title">{{ song.songId }} {{ song.title }}</h2>
         <div class="song__buttons">
-            <button :disabled="disablePreviousButton" @click="goToPreviousSong">Atgal</button>
+            <button class="song__navigation-button" :disabled="disablePreviousButton"
+                    @click="goToPreviousSong">{{ getPreviousSongId() }}
+            </button>
 
             <button class="song__font-size-button" @click="adjustFontSize(true)">Aa++</button>
             <button class="song__font-size-button" @click="adjustFontSize(false)">Aa--</button>
@@ -18,7 +20,9 @@
                 </svg>
             </button>
 
-            <button :disabled="disableNextButton" @click="goToNextSong">Kitas</button>
+            <button class="song__navigation-button" :disabled="disableNextButton"
+                    @click="goToNextSong">{{ getNextSongId() }}
+            </button>
         </div>
         <p class="song__verse">
             <em>{{ song.verse }}</em>
@@ -36,8 +40,14 @@
             </div>
         </div>
 
-        <div style="text-align: center;">
+
+        <div style="text-align: center; margin-top: 20px;">
             <div class="song__body" :style="fontSizeStyle" v-html="song.body"></div>
+        </div>
+
+        <div class="image-format-container" style="margin-top: 20px;">
+            <button :class="['song__font-size-button', 'image-format-button', { 'selected': imageType === 'svg' }]" @click="updateImageType('svg')">Rodyti SVG</button>
+            <button :class="['song__font-size-button', 'image-format-button', { 'selected': imageType === 'jpg' }]" @click="updateImageType('jpg')">Rodyti JPG</button>
         </div>
 
         <div class="song-image">
@@ -71,9 +81,8 @@ export default {
 
     data() {
         return {
-
-            baseUrl: 'https://adventistai.lt/giesmes/notes/svg/',
-            imageEnding: '.svg',
+            imageType: 'jpg',
+            baseUrl: '',
 
             song: null, // Initialize with null
             songIds: [], // Initialize with an empty array
@@ -96,15 +105,14 @@ export default {
             };
         },
         imageUrl1() {
-            return `${this.baseUrl}${this.songId}${this.imageEnding}`;
+            return `${this.baseUrl}${this.songId}.${this.imageType}`;
         },
         imageUrl2() {
-            return `${this.baseUrl}/${this.songId}${this.imageEnding.replace('.svg', '_1.svg')}`;
+            return `${this.baseUrl}/${this.songId}_1.${this.imageType}`;
         },
         imageUrl3() {
-            return `${this.baseUrl}/${this.songId}${this.imageEnding.replace('.svg', '_2.svg')}`;
+            return `${this.baseUrl}/${this.songId}_2.${this.imageType}`;
         },
-
 
         disablePreviousButton() {
             // Check if song and songIds are not null or empty
@@ -122,21 +130,25 @@ export default {
             const currentIndex = this.songIds.indexOf(this.song.songId);
             return currentIndex >= this.songIds.length - 1;
         },
-
-
     },
 
     watch: {
         '$route': 'fetchSong',
-
     },
 
     created() {
+        // this.baseUrl = `https://adventistai.lt/giesmes/notes/${this.imageType}/`;
         this.fetchSongs();
         this.fetchSong();
+
     },
 
     methods: {
+        updateImageType(type) {
+            this.imageType = type;
+            this.baseUrl = `https://adventistai.lt/giesmes/notes/${this.imageType}/`;
+        },
+
         getAudioSourceUrl(key) {
             return `https://adventistai.lt/giesmes/${key}/${this.song.songId}.mp3`;
         },
@@ -159,6 +171,7 @@ export default {
         },
 
         fetchSong() {
+            this.baseUrl = `https://adventistai.lt/giesmes/notes/${this.imageType}/`;
             this.$songs.where('songId').equals(this.songId).first().then(song => {
                 this.song = song;
             });
@@ -173,6 +186,14 @@ export default {
                 window.location.reload(); // Force reload the page
             }
         },
+
+        getPreviousSongId() {
+            const currentIndex = this.songIds.indexOf(this.song.songId);
+            if (currentIndex > 0) {
+                return this.songIds[currentIndex - 1];
+            }
+            return '';
+        },
         goToNextSong() {
             const currentIndex = this.songIds.indexOf(this.song.songId);
             if (currentIndex < this.songIds.length - 1) {
@@ -182,6 +203,13 @@ export default {
             }
         },
 
+        getNextSongId() {
+            const currentIndex = this.songIds.indexOf(this.song.songId);
+            if (currentIndex < this.songIds.length - 1) {
+                return this.songIds[currentIndex + 1];
+            }
+            return '';
+        },
 
 
         audioError(event) {
@@ -198,7 +226,6 @@ export default {
                         this.song.favorited = this.song.favorited ? 0 : 1;
                     }
                 })
-                .catch(err => Sentry && Sentry.captureException(err));
         },
         adjustFontSize(increase) {
             increase ? (this.fontSize += 1) : (this.fontSize -= 1);
@@ -208,6 +235,56 @@ export default {
 </script>
 
 <style lang="scss">
+.image-format-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.image-format-button {
+    font-size: 16px;
+    line-height: 1.5;
+    background-color: transparent;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    margin-right: 10px;
+    color: black; /* Set the text color to black */
+    transition: background-color 0.3s, color 0.3s; /* Add transition for smooth color change */
+    font-weight: normal; /* Set the font weight to normal */
+}
+
+.image-format-button.selected {
+    background-color: dodgerblue;
+    color: black; /* Set the text color to black */
+    font-weight: bold; /* Set the font weight to bold */
+}
+
+.image-format-button:hover:not(.selected) {
+    background-color: lightgray;
+    color: white; /* Set the text color to white */
+}
+
+
+.song__navigation-button {
+    font-size: 18px;
+    line-height: 1.5;
+    @extend %button-shadow;
+    background-color: lightblue; // Example color, adjust as needed
+    color: black; // Set the text color to black
+    padding: 8px 12px;
+    font-weight: 500; // Set a lighter font weight value
+}
+
+.song__navigation-button:focus {
+    outline: none; // Remove the default focus outline if desired
+}
+
+.song__navigation-button:hover:not([disabled]) {
+    background-color: dodgerblue; // Example hover color, adjust as needed
+}
+
+
 .audio-player {
     justify-content: center;
     display: flex;
