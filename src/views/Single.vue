@@ -97,7 +97,7 @@ export default {
             songIds: [], // Initialize with an empty array
 
             get fontSize() {
-                return parseInt(localStorage.getItem('fontSize'), 10) || 16;
+                return parseInt(localStorage.getItem('fontSize'), 10) || 24;
             },
             // eslint-disable-next-line vue/no-dupe-keys
             set fontSize(newVal) {
@@ -227,17 +227,17 @@ export default {
         },
         toggleFavorite() {
             this.$songs
-                .update(this.song.songId, {
+                .update(this.song.id, {
                     favorited: this.song.favorited ? 0 : 1,
                 })
-                .then(successfullyUpdated => {
-                    if (successfullyUpdated) {
+                .then(successfullyUpadated => {
+                    if (successfullyUpadated) {
                         this.song.favorited = this.song.favorited ? 0 : 1;
+                    } else {
+                        // console.info('Failed to toggle favorite');
                     }
                 })
-                .catch(err => {
-                    console.error('Failed to update favorited status:', err);
-                });
+                .catch(err => Sentry && Sentry.captureException(err));
         },
         adjustFontSize(increase) {
             increase ? (this.fontSize += 1) : (this.fontSize -= 1);
@@ -388,7 +388,7 @@ export default {
         display: inline-block;
         text-align: left;
         alignment: center;
-        font-size: 16px;
+        font-size: 24px;
         margin-bottom: 20px;
     }
 
