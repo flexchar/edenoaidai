@@ -3,6 +3,10 @@
     <div v-if="song" class="song">
         <h2 class="song__title">{{ song.songId }} {{ song.title }}</h2>
         <div class="song__buttons">
+            <div class="song__navigation">
+                <button :disabled="disablePreviousButton" @click="goToPreviousSong">Previous</button>
+                <button :disabled="disableNextButton" @click="goToNextSong">Next</button>
+            </div>
             <button class="song__font-size-button" @click="adjustFontSize(true)">Aa++</button>
             <button class="song__font-size-button" @click="adjustFontSize(false)">Aa--</button>
             <button
@@ -95,7 +99,18 @@ export default {
         },
         imageUrl3() {
             return `${this.baseUrl}/${this.songId}${this.imageEnding.replace('.svg', '_2.svg')}`;
-        }
+        },
+
+        disablePreviousButton() {
+            // Check if there is a previous song based on the current songId
+            const currentIndex = this.songs.findIndex(song => song.songId === this.songId);
+            return currentIndex <= 0;
+        },
+        disableNextButton() {
+            // Check if there is a next song based on the current songId
+            const currentIndex = this.songs.findIndex(song => song.songId === this.songId);
+            return currentIndex >= this.songs.length - 1;
+        },
     },
 
     created() {
@@ -109,6 +124,22 @@ export default {
             .catch(err => Sentry && Sentry.captureException(err));
     },
     methods: {
+
+        goToPreviousSong() {
+            const currentIndex = this.songs.findIndex(song => song.songId === this.songId);
+            if (currentIndex > 0) {
+                const previousSongId = this.songs[currentIndex - 1].songId;
+                this.$router.push(`/song/${previousSongId}`);
+            }
+        },
+        goToNextSong() {
+            const currentIndex = this.songs.findIndex(song => song.songId === this.songId);
+            if (currentIndex < this.songs.length - 1) {
+                const nextSongId = this.songs[currentIndex + 1].songId;
+                this.$router.push(`/song/${nextSongId}`);
+            }
+        },
+
 
 
         test(event) {
