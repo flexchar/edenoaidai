@@ -3,12 +3,11 @@
     <div v-if="song" class="song">
         <h2 class="song__title">{{ song.songId }} {{ song.title }}</h2>
         <div class="song__buttons">
-            <div class="song__navigation">
-                <button :disabled="disablePreviousButton" @click="goToPreviousSong">Previous</button>
-                <button :disabled="disableNextButton" @click="goToNextSong">Next</button>
-            </div>
+            <button :disabled="disablePreviousButton" @click="goToPreviousSong">Previous</button>
+
             <button class="song__font-size-button" @click="adjustFontSize(true)">Aa++</button>
             <button class="song__font-size-button" @click="adjustFontSize(false)">Aa--</button>
+
             <button
                 class="song__favorite-button"
                 :title="song.favorited ? 'Išsaugota' : 'Pamėgti'"
@@ -18,6 +17,8 @@
                     <use :href="song.favorited ? '#icon-star-full' : '#icon-star-empty'"></use>
                 </svg>
             </button>
+
+            <button :disabled="disableNextButton" @click="goToNextSong">Next</button>
         </div>
         <p class="song__verse">
             <em>{{ song.verse }}</em>
@@ -27,9 +28,11 @@
             <svg class="icon-audio">
                 <use :href="`#icon-${key}`"></use>
             </svg>
-            <div v-if="index !== undefined" class="audio-player" >
-                <audio v-show="audioExist" :id="'audio-' + index" ref="audio" preload="metadata" controls>
-                    <source :src="'https://adventistai.lt/giesmes/'+ key +'/' + songId + '.mp3'" type="audio/mpeg" @error="audioError">
+            <div v-if="index !== undefined" class="audio-player">
+                <audio v-show="audioExist" :id="'audio-' + index" ref="audio" preload="metadata"
+                       controls>
+                    <source :src="'https://adventistai.lt/giesmes/'+ key +'/' + songId + '.mp3'"
+                            type="audio/mpeg" @error="audioError">
                     Naršyklė nepalaiko audio elementų.
                 </audio>
             </div>
@@ -75,7 +78,9 @@ export default {
             baseUrl: 'https://adventistai.lt/giesmes/notes/svg/',
             imageEnding: '.svg',
 
-            song: {},
+            song: null, // Initialize with null
+            songIds: [], // Initialize with an empty array
+
             get fontSize() {
                 return parseInt(localStorage.getItem('fontSize'), 10) || 16;
             },
@@ -85,6 +90,8 @@ export default {
             },
         };
     },
+
+
     computed: {
         fontSizeStyle() {
             return {
@@ -101,45 +108,95 @@ export default {
             return `${this.baseUrl}/${this.songId}${this.imageEnding.replace('.svg', '_2.svg')}`;
         },
 
+
         disablePreviousButton() {
-            // Check if there is a previous song based on the current songId
-            const currentIndex = this.songs.findIndex(song => song.songId === this.songId);
+            // Check if song and songIds are not null or empty
+            if (!this.song || !this.songIds.length) {
+                return true;
+            }
+            const currentIndex = this.songIds.indexOf(this.song.songId);
             return currentIndex <= 0;
         },
         disableNextButton() {
-            // Check if there is a next song based on the current songId
-            const currentIndex = this.songs.findIndex(song => song.songId === this.songId);
-            return currentIndex >= this.songs.length - 1;
+            // Check if song and songIds are not null or empty
+            if (!this.song || !this.songIds.length) {
+                return true;
+            }
+            const currentIndex = this.songIds.indexOf(this.song.songId);
+            return currentIndex >= this.songIds.length - 1;
         },
+
+
+    },
+
+    watch: {
+        '$route': 'fetchSong'
     },
 
     created() {
-        this.$songs
-            .get({
-                songId: this.songId,
-            })
-            .then(song => {
-                this.song = song;
-            })
-            .catch(err => Sentry && Sentry.captureException(err));
+        this.fetchSongs();
+        this.fetchSong();
+        // this.$songs
+        //     .toArray()
+        //     .then(songs => {
+        //         this.songIds = songs
+        //             .map(song => ({ id: parseInt(song.id, 10), songId: song.songId })) // Create array of objects
+        //             .sort((a, b) => a.id - b.id) // Sort these objects by id
+        //             .map(song => song.songId); // Extract the songId in the correct order
+        //         this.$songs.where('songId').equals(this.songId).first().then(song => {
+        //             this.song = song;
+        //         });
+        //     })
     },
     methods: {
 
+
+        fetchSongs() {
+            // this.$songs
+            //     .toArray()
+            //     .then(songs => {
+            //         this.songIds = songs
+            //             .map(song => ({ id: parseInt(song.id, 10), songId: song.songId })) // Create array of objects
+            //             .sort((a, b) => a.id - b.id) // Sort these objects by id
+            //             .map(song => song.songId); // Extract the songId in the correct order
+            //     });
+
+            this.$songs.toArray().then((songs) => {
+                this.songIds = songs
+                    .map((song) => ({id: parseInt(song.id, 10), songId: song.songId}))
+                    .sort((a, b) => a.id - b.id)
+                    .map((song) => song.songId);
+
+                this.$songs
+                    .where('songId')
+                    .equals(this.songId)
+                    .first()
+                    .then((song) => {
+                        this.song = song;
+                    });
+            });
+        },
+
+        fetchSong() {
+            this.$songs.where('songId').equals(this.songId).first().then(song => {
+                this.song = song;
+            });
+        },
+
         goToPreviousSong() {
-            const currentIndex = this.songs.findIndex(song => song.songId === this.songId);
+            const currentIndex = this.songIds.indexOf(this.song.songId);
             if (currentIndex > 0) {
-                const previousSongId = this.songs[currentIndex - 1].songId;
+                const previousSongId = this.songIds[currentIndex - 1];
                 this.$router.push(`/song/${previousSongId}`);
             }
         },
         goToNextSong() {
-            const currentIndex = this.songs.findIndex(song => song.songId === this.songId);
-            if (currentIndex < this.songs.length - 1) {
-                const nextSongId = this.songs[currentIndex + 1].songId;
+            const currentIndex = this.songIds.indexOf(this.song.songId);
+            if (currentIndex < this.songIds.length - 1) {
+                const nextSongId = this.songIds[currentIndex + 1];
                 this.$router.push(`/song/${nextSongId}`);
             }
         },
-
 
 
         test(event) {
@@ -151,14 +208,12 @@ export default {
         },
         toggleFavorite() {
             this.$songs
-                .update(this.song.id, {
+                .update(this.song.songId, {
                     favorited: this.song.favorited ? 0 : 1,
                 })
-                .then(successfullyUpadated => {
-                    if (successfullyUpadated) {
+                .then(successfullyUpdated => {
+                    if (successfullyUpdated) {
                         this.song.favorited = this.song.favorited ? 0 : 1;
-                    } else {
-                        // console.info('Failed to toggle favorite');
                     }
                 })
                 .catch(err => Sentry && Sentry.captureException(err));
@@ -176,12 +231,14 @@ export default {
     display: flex;
     margin: 10px;
 }
-.song-image{
+
+.song-image {
     justify-content: center;
     display: grid;
     margin: 20px
 }
-.song-image img{
+
+.song-image img {
     max-width: 100%;
     width: auto;
     height: auto;
@@ -189,6 +246,32 @@ export default {
     image-rendering: optimizeQuality;
 
     object-fit: cover;
+}
+
+.song__buttons {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    padding: 10px 0;
+}
+
+.song__buttons button {
+    margin-right: 10px;
+    border: none;
+    border-radius: 20px;
+    background-color: white;
+    box-shadow: 2px 2px 5px 0 rgba(0, 0, 0, 0.4);
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.song__buttons button[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.song__buttons button:hover:not([disabled]) {
+    background-color: lightgray;
 }
 
 .song {
@@ -199,11 +282,13 @@ export default {
         margin: 0 0 10px;
         border-bottom: 1px solid black;
     }
+
     &__verse {
         font-size: 16px;
         text-align: center;
         margin: 0 0 20px;
     }
+
     &__body {
         display: inline-block;
         text-align: left;
@@ -211,21 +296,25 @@ export default {
         font-size: 16px;
         margin-bottom: 20px;
     }
+
     &__buttons {
         justify-content: center;
         align-items: center;
         display: flex;
         padding: 10px 0;
+
         > :not(:last-child) {
             margin-right: 10px;
         }
     }
+
     %button-shadow {
         border: none;
         border-radius: 20px;
         background-color: white;
         box-shadow: 2px 2px 5px 0 rgba(0, 0, 0, 0.4);
     }
+
     &__favorite-button {
         display: inline-block;
         font-size: 20px;
@@ -236,16 +325,19 @@ export default {
         color: rgba(228, 179, 99, 1);
         @extend %button-shadow;
     }
+
     &__font-size-button {
         font-size: 16px;
         line-height: 1.5;
         @extend %button-shadow;
     }
+
     &__copyright {
         text-align: center;
         justify-content: center;
         display: flex;
     }
+
     .icon-audio {
         display: block;
         margin: 0 auto;
