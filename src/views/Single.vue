@@ -28,10 +28,12 @@
             <em>{{ song.verse }}</em>
         </p>
 
-        <div v-for="(key, index) in song.lists" :key="index">
-            <svg class="icon-audio">
-                <use :href="`#icon-${key}`"></use>
-            </svg>
+        <div v-for="(key, index) in song.lists" :key="index" class="audio-container">
+            <div class="audio-icon">
+                <svg class="song__icon-audio">
+                    <use :href="`#icon-${key}`"></use>
+                </svg>
+            </div>
             <div v-if="index !== undefined" class="audio-player">
                 <audio :ref="`audio-${index}`" preload="metadata" controls>
                     <source :src="getAudioSourceUrl(key)" type="audio/mpeg" @error="audioError">
@@ -39,6 +41,7 @@
                 </audio>
             </div>
         </div>
+
 
 
         <div style="text-align: center; margin-top: 20px;">
@@ -283,6 +286,29 @@ export default {
 .song__navigation-button:hover:not([disabled]) {
     background-color: dodgerblue; // Example hover color, adjust as needed
 }
+
+.audio-container {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Horizontally center the elements */
+    margin-bottom: 10px;
+}
+
+.audio-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    width: 60px; /* Adjust the width as needed */
+    height: 60px; /* Adjust the height as needed */
+    fill: black;
+    /*transform: scale(1);*/ /* Adjust the scale factor as needed */
+}
+
+/*.icon-audio {
+    width: 70%; !* Adjust the width as needed *!
+    height: 70%; !* Adjust the height as needed *!
+}*/
 
 
 .audio-player {
