@@ -16,7 +16,8 @@
                 @click="toggleFavorite"
             >
                 <svg class="icon">
-                    <use :href="song.favorited ? '#icon-star-full' : '#icon-star-empty'"></use>
+                    <use v-if="song.favorited" :href="`#icon-star-full`"></use>
+                    <use v-else :href="`#icon-star-empty`"></use>
                 </svg>
             </button>
 
@@ -43,14 +44,19 @@
         </div>
 
 
-
         <div style="text-align: center; margin-top: 20px;">
             <div class="song__body" :style="fontSizeStyle" v-html="song.body"></div>
         </div>
 
         <div class="image-format-container" style="margin-top: 20px;">
-            <button :class="['song__font-size-button', 'image-format-button', { 'selected': imageType === 'svg' }]" @click="updateImageType('svg')">Rodyti SVG</button>
-            <button :class="['song__font-size-button', 'image-format-button', { 'selected': imageType === 'jpg' }]" @click="updateImageType('jpg')">Rodyti JPG</button>
+            <button
+                :class="['song__font-size-button', 'image-format-button', { 'selected': imageType === 'svg' }]"
+                @click="updateImageType('svg')">Rodyti SVG
+            </button>
+            <button
+                :class="['song__font-size-button', 'image-format-button', { 'selected': imageType === 'jpg' }]"
+                @click="updateImageType('jpg')">Rodyti JPG
+            </button>
         </div>
 
         <div class="song-image">
@@ -229,6 +235,9 @@ export default {
                         this.song.favorited = this.song.favorited ? 0 : 1;
                     }
                 })
+                .catch(err => {
+                    console.error('Failed to update favorited status:', err);
+                });
         },
         adjustFontSize(increase) {
             increase ? (this.fontSize += 1) : (this.fontSize -= 1);
@@ -302,7 +311,8 @@ export default {
     width: 60px; /* Adjust the width as needed */
     height: 60px; /* Adjust the height as needed */
     fill: black;
-    /*transform: scale(1);*/ /* Adjust the scale factor as needed */
+    /*transform: scale(1);*/
+    /* Adjust the scale factor as needed */
 }
 
 /*.icon-audio {
