@@ -3,7 +3,7 @@
     <div v-if="song" class="song">
         <h2 class="song__title">{{ song.songId }} {{ song.title }}</h2>
         <div class="song__buttons">
-            <button :disabled="disablePreviousButton" @click="goToPreviousSong">Previous</button>
+            <button :disabled="disablePreviousButton" @click="goToPreviousSong">Atgal</button>
 
             <button class="song__font-size-button" @click="adjustFontSize(true)">Aa++</button>
             <button class="song__font-size-button" @click="adjustFontSize(false)">Aa--</button>
@@ -18,7 +18,7 @@
                 </svg>
             </button>
 
-            <button :disabled="disableNextButton" @click="goToNextSong">Next</button>
+            <button :disabled="disableNextButton" @click="goToNextSong">Kitas</button>
         </div>
         <p class="song__verse">
             <em>{{ song.verse }}</em>
@@ -29,10 +29,8 @@
                 <use :href="`#icon-${key}`"></use>
             </svg>
             <div v-if="index !== undefined" class="audio-player">
-                <audio v-show="audioExist" :id="'audio-' + index" ref="audio" preload="metadata"
-                       controls>
-                    <source :src="'https://adventistai.lt/giesmes/'+ key +'/' + songId + '.mp3'"
-                            type="audio/mpeg" @error="audioError">
+                <audio :ref="`audio-${index}`" preload="metadata" controls>
+                    <source :src="getAudioSourceUrl(key)" type="audio/mpeg" @error="audioError">
                     Naršyklė nepalaiko audio elementų.
                 </audio>
             </div>
@@ -73,7 +71,6 @@ export default {
 
     data() {
         return {
-            audioExist: true,
 
             baseUrl: 'https://adventistai.lt/giesmes/notes/svg/',
             imageEnding: '.svg',
@@ -130,37 +127,21 @@ export default {
     },
 
     watch: {
-        '$route': 'fetchSong'
+        '$route': 'fetchSong',
+
     },
 
     created() {
         this.fetchSongs();
         this.fetchSong();
-        // this.$songs
-        //     .toArray()
-        //     .then(songs => {
-        //         this.songIds = songs
-        //             .map(song => ({ id: parseInt(song.id, 10), songId: song.songId })) // Create array of objects
-        //             .sort((a, b) => a.id - b.id) // Sort these objects by id
-        //             .map(song => song.songId); // Extract the songId in the correct order
-        //         this.$songs.where('songId').equals(this.songId).first().then(song => {
-        //             this.song = song;
-        //         });
-        //     })
     },
-    methods: {
 
+    methods: {
+        getAudioSourceUrl(key) {
+            return `https://adventistai.lt/giesmes/${key}/${this.song.songId}.mp3`;
+        },
 
         fetchSongs() {
-            // this.$songs
-            //     .toArray()
-            //     .then(songs => {
-            //         this.songIds = songs
-            //             .map(song => ({ id: parseInt(song.id, 10), songId: song.songId })) // Create array of objects
-            //             .sort((a, b) => a.id - b.id) // Sort these objects by id
-            //             .map(song => song.songId); // Extract the songId in the correct order
-            //     });
-
             this.$songs.toArray().then((songs) => {
                 this.songIds = songs
                     .map((song) => ({id: parseInt(song.id, 10), songId: song.songId}))
@@ -183,11 +164,13 @@ export default {
             });
         },
 
+
         goToPreviousSong() {
             const currentIndex = this.songIds.indexOf(this.song.songId);
             if (currentIndex > 0) {
                 const previousSongId = this.songIds[currentIndex - 1];
                 this.$router.push(`/song/${previousSongId}`);
+                window.location.reload(); // Force reload the page
             }
         },
         goToNextSong() {
@@ -195,13 +178,12 @@ export default {
             if (currentIndex < this.songIds.length - 1) {
                 const nextSongId = this.songIds[currentIndex + 1];
                 this.$router.push(`/song/${nextSongId}`);
+                window.location.reload(); // Force reload the page
             }
         },
 
 
-        test(event) {
-            console.log("test test test ", event)
-        },
+
         audioError(event) {
             console.log('got error: ', event)
 
