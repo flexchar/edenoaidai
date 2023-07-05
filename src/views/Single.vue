@@ -4,7 +4,7 @@
         <h2 class="song__title">{{ song.songId }} {{ song.title }}</h2>
         <div class="song__buttons">
             <button class="song__navigation-button" :disabled="disablePreviousButton"
-                    @click="goToPreviousSong">{{ getPreviousSongId() }}
+                    @click="goToPreviousSong">{{ getPreviousSongId() }} ←
             </button>
 
             <button class="song__font-size-button" @click="adjustFontSize(true)">Aa++</button>
@@ -22,7 +22,7 @@
             </button>
 
             <button class="song__navigation-button" :disabled="disableNextButton"
-                    @click="goToNextSong">{{ getNextSongId() }}
+                    @click="goToNextSong">→ {{ getNextSongId() }}
             </button>
         </div>
         <p class="song__verse">
