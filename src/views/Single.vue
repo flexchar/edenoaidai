@@ -308,18 +308,11 @@ export default {
     align-items: center;
     justify-content: center;
     margin-right: 10px;
-    width: 60px; /* Adjust the width as needed */
-    height: 60px; /* Adjust the height as needed */
+    margin-left: 10px; /* Add left margin as desired */
+    width: 40px; /* Adjust the width to make the icon smaller */
+    height: 40px; /* Adjust the height to make the icon smaller */
     fill: black;
-    /*transform: scale(1);*/
-    /* Adjust the scale factor as needed */
 }
-
-/*.icon-audio {
-    width: 70%; !* Adjust the width as needed *!
-    height: 70%; !* Adjust the height as needed *!
-}*/
-
 
 .audio-player {
     justify-content: center;
