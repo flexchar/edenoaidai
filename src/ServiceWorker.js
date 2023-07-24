@@ -7,7 +7,7 @@
 const { strategies, expiration, cacheableResponse } = workbox;
 
 // Use the CACHE_VERSION constant
-const CACHE_VERSION = 'v5';
+const CACHE_VERSION = 'v6';
 
 /**
  * Forcefully take over clients after update
