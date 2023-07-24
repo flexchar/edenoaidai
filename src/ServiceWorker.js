@@ -1,4 +1,4 @@
-/* global workbox */
+/*  global workbox */
 
 /**
  * Load plugins
@@ -121,15 +121,28 @@ workbox.routing.registerRoute(
 // eslint-disable-next-line no-restricted-globals
 self.addEventListener('activate', event => {
     event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.filter(cacheName => {
-                    // Check if the cache name starts with the old version prefix
-                    return cacheName.startsWith('default-') && !cacheName.includes(CACHE_VERSION);
-                }).map(cacheName => {
-                    return caches.delete(cacheName);
-                })
-            );
+        // eslint-disable-next-line no-undef
+        clients.claim().then(() => {
+            // After the service worker takes control,
+            // delete the old database
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.deleteDatabase('edenoAidai');
+                request.onsuccess = () => {
+                    console.log('Old database deleted.');
+                    // Now the old database is deleted. Send a message to the client to reload the database
+                    // eslint-disable-next-line no-restricted-globals
+                    self.clients.matchAll().then(clients => {
+                        clients.forEach(client => client.postMessage('reloadDatabase'));
+                    });
+                    resolve();
+                };
+                request.onerror = reject;
+                request.onblocked = () => {
+                    console.log('Old database deletion blocked.');
+                    // If the database can't be deleted because it's still in use,
+                    // you might want to inform the user and ask them to refresh the page
+                };
+            });
         })
     );
 });
