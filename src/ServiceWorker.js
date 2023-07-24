@@ -29,6 +29,21 @@ workbox.precaching.precacheAndRoute([
     {
         url: '/',
     },
+    {
+        url: './components/List.vue',
+    },
+    {
+        url: './views/Home.vue',
+    },
+    {
+        url: './views/Install.vue',
+    },
+    {
+        url: './views/Search.vue',
+    },
+    {
+        url: './views/Single.vue',
+    },
     ...self.__precacheManifest /* eslint-disable-line */,
 ]);
 const OFFLINE_FALLBACK_URI = workbox.precaching.getCacheKeyForURL('/');
