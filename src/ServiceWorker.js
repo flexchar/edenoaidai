@@ -7,8 +7,7 @@
 const { strategies, expiration, cacheableResponse } = workbox;
 
 // Use the CACHE_VERSION constant
-
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v6';
 
 /**
  * Forcefully take over clients after update
@@ -47,6 +46,9 @@ workbox.precaching.precacheAndRoute([
     },
     {
         url: './views/Single.vue',
+    },
+    {
+        url: './database.js',
     },
     ...self.__precacheManifest /* eslint-disable-line */,
 ]);
