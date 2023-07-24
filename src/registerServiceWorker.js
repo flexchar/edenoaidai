@@ -1,4 +1,4 @@
-/* global caches, self */
+/* global Sentry */
 import { isBot } from './helpers/isBot';
 
 export default async () => {
@@ -7,40 +7,25 @@ export default async () => {
         return;
     }
 
-    const swDisabled = localStorage.getItem('sw');
+    const swDisabled = false || localStorage.getItem('sw');
 
     if (swDisabled) {
         // If disabled, try to unregister it
-        // usually for development reasons
+        // usually for developments reasons
         const serviceWorker = await navigator.serviceWorker.getRegistration();
         if (serviceWorker) {
             await serviceWorker.unregister();
             console.info('Service worker successfully unregistered.');
         }
+    } else {
+        navigator.serviceWorker
+            .register(`${window.location.origin}/service-worker.js`)
+            // .then(() => console.info('Browser supports SW, PWA Enabled!'))
+            .catch(err =>
+                Sentry
+                    ? Sentry.captureException(err)
+                    : // eslint-disable-next-line no-console
+                      console.error(`Failed to register SW: `, err),
+            );
     }
-
-    // Update the service worker registration code here
-    if ('serviceWorker' in navigator) {
-        try {
-            const registration = await navigator.serviceWorker.register('/ServiceWorker.js');
-            console.info('Service worker registered:', registration);
-        } catch (error) {
-            console.error('Failed to register service worker:', error);
-        }
-    }
-
-    // Add the cache clearing code here
-    /* eslint-disable no-restricted-globals */
-    self.addEventListener('activate', event => {
-        event.waitUntil(
-            caches.keys().then(cacheNames => {
-                return Promise.all(
-                    cacheNames.map(cacheName => {
-                        return caches.delete(cacheName);
-                    })
-                );
-            })
-        );
-    });
-    /* eslint-enable no-restricted-globals */
 };

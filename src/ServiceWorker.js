@@ -6,9 +6,6 @@
  */
 const { strategies, expiration, cacheableResponse } = workbox;
 
-// Use the CACHE_VERSION constant
-const CACHE_VERSION = 'v2';
-
 /**
  * Forcefully take over clients after update
  */
@@ -72,7 +69,7 @@ workbox.routing.setDefaultHandler({
     handle: args => {
         if (args.event.request.method === 'GET') {
             return new strategies.CacheFirst({
-                cacheName: `default-${CACHE_VERSION}`,
+                cacheName: 'default',
                 // as a default handler, it may cache too many resources,
                 // limit to 50 entries and only for good w/200 responses
                 plugins: [
@@ -97,7 +94,6 @@ workbox.routing.setDefaultHandler({
 workbox.routing.registerRoute(
     new RegExp('.json$'),
     new strategies.CacheFirst({
-        cacheName: `json-${CACHE_VERSION}`,
         plugins: [
             new cacheableResponse.Plugin({
                 statuses: [200],
@@ -110,23 +106,7 @@ workbox.routing.registerRoute(
  * Sentry API
  */
 workbox.routing.registerRoute(
+    //
     new RegExp('https://sentry.io/api/.*'),
     new strategies.NetworkOnly(),
 );
-
-// Clear old caches when a new service worker is activated
-// eslint-disable-next-line no-restricted-globals
-self.addEventListener('activate', event => {
-    event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.filter(cacheName => {
-                    // Check if the cache name starts with the old version prefix
-                    return cacheName.startsWith('default-') && !cacheName.includes(CACHE_VERSION);
-                }).map(cacheName => {
-                    return caches.delete(cacheName);
-                })
-            );
-        })
-    );
-});
