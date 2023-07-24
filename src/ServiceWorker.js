@@ -7,7 +7,7 @@
 const { strategies, expiration, cacheableResponse } = workbox;
 
 // Use the CACHE_VERSION constant
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 
 /**
  * Forcefully take over clients after update
@@ -72,7 +72,7 @@ workbox.routing.setDefaultHandler({
     handle: args => {
         if (args.event.request.method === 'GET') {
             return new strategies.CacheFirst({
-                cacheName: `default-${CACHE_VERSION}`,
+                cacheName: 'default',
                 // as a default handler, it may cache too many resources,
                 // limit to 50 entries and only for good w/200 responses
                 plugins: [

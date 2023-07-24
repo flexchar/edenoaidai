@@ -21,7 +21,26 @@ export default async () => {
         const version = new Date().getTime(); // Use current timestamp as version
         navigator.serviceWorker
             .register(`${window.location.origin}/service-worker.js?${version}`)
-            // .then(() => console.info('Browser supports SW, PWA Enabled!'))
+            .then((registration) => {
+                // Check if a new service worker is getting installed
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+
+                    newWorker.addEventListener('statechange', () => {
+                        // If the new service worker is installed, ask users to refresh their page to use the new version
+                        if (newWorker.state === 'installed') {
+                            if (navigator.serviceWorker.controller) {
+                                // Show an update banner or alert
+                                console.info('New content is available; please refresh.');
+                                // You can also use a custom event to show a popup or banner in your web app asking users to refresh
+                                // document.dispatchEvent(new Event('swUpdated'));
+                            } else {
+                                console.info('Content is cached for offline use.');
+                            }
+                        }
+                    });
+                });
+            })
             .catch(err =>
                 Sentry
                     ? Sentry.captureException(err)
