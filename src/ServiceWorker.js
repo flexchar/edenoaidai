@@ -129,25 +129,12 @@ self.addEventListener('activate', event => {
                 const request = indexedDB.deleteDatabase('edenoAidai');
                 request.onsuccess = () => {
                     console.log('Old database deleted.');
-                    // Now the old database is deleted. Open a new one:
-                    const dbRequest = indexedDB.open('edenoAidai', 1);
-                    dbRequest.onerror = function() {
-                        console.error("Error", dbRequest.error);
-                    };
-                    dbRequest.onsuccess = function() {
-                        console.log("Database reinitialized");
-                        // Send a message to the client to reload the database
-                        // eslint-disable-next-line no-restricted-globals
-                        self.clients.matchAll().then(clients => {
-                            clients.forEach(client => client.postMessage('reloadDatabase'));
-                        });
-                        resolve();
-                    };
-                    // eslint-disable-next-line no-shadow
-                    dbRequest.onupgradeneeded = function(event) {
-                        const db = event.target.result;
-                        db.createObjectStore('songs', { keyPath: 'id', autoIncrement: true });
-                    };
+                    // Now the old database is deleted. Send a message to the client to reload the database
+                    // eslint-disable-next-line no-restricted-globals
+                    self.clients.matchAll().then(clients => {
+                        clients.forEach(client => client.postMessage('reloadDatabase'));
+                    });
+                    resolve();
                 };
                 request.onerror = reject;
                 request.onblocked = () => {
