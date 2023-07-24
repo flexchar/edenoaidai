@@ -4,7 +4,6 @@
         {{ message }}
         {{ progress }}
         <div v-if="errorId">Klaidos kodas: {{ errorId }}</div>
-        <div v-if="updateAvailable" class="update-message">A new version is available. Please refresh the page.</div>
     </div>
 </template>
 
@@ -21,7 +20,6 @@ export default {
             current: 0,
             errorId: '',
             tracks: [],
-            updateAvailable: false,
         };
     },
     computed: {
@@ -41,44 +39,8 @@ export default {
             this.message = `Įvyko klaida: ${error.message}`;
         }
     },
-    mounted() {
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.onmessage = (event) => {
-                if (event.data === 'reloadDatabase') {
-                    this.reloadDatabase();
-                }
-            };
-
-            navigator.serviceWorker.ready.then(registration => {
-                // eslint-disable-next-line no-param-reassign
-                registration.onupdatefound = () => {
-                    const newWorker = registration.installing;
-                    newWorker.onstatechange = () => {
-                        if (newWorker.state === 'installed') {
-                            if (navigator.serviceWorker.controller) {
-                                // new update available
-                                this.updateAvailable = true;
-                            }
-                        }
-                    };
-                };
-            });
-        }
-    },
-
 
     methods: {
-        async reloadDatabase() {
-            try {
-                const songs = await this.fetchSongs();
-                const tracks = await this.fetchTracks();
-                if (await this.importSongs(songs, tracks)) {
-                    this.success();
-                }
-            } catch (error) {
-                this.message = `Įvyko klaida: ${error.message}`;
-            }
-        },
 
         /**
          * Fetches songs from JSON API
@@ -124,12 +86,6 @@ export default {
             this.total = songs.length;
             let status = false;
 
-            // Clear the table first
-            await this.$songs.clear().catch(error => {
-                status = false;
-                console.error(error);
-            });
-
             songs.forEach(song => {
                 status = true;
 
@@ -173,9 +129,5 @@ export default {
 <style>
 .install-message {
     text-align: center;
-}
-
-.update-message {
-    color: red;
 }
 </style>
