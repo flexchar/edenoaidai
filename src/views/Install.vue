@@ -4,7 +4,7 @@
         {{ message }}
         {{ progress }}
         <div v-if="errorId">Klaidos kodas: {{ errorId }}</div>
-        <div v-if="updateAvailable" class="update-message">A new version is available. Please refresh the page.</div>
+        <div v-if="updateAvailable" class="update-message">Yra nauji atnaujinimai. Perkraukite puslapį.</div>
     </div>
 </template>
 

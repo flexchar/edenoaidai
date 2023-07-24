@@ -1,5 +1,3 @@
-/* eslint-disable no-param-reassign */
-
 import Dexie from 'dexie';
 import router from './router';
 
@@ -33,9 +31,28 @@ function needsInstall(table) {
 }
 
 export default async function(Vue) {
-    const database = getDatabaseInstance();
+    let database = getDatabaseInstance();
+    // eslint-disable-next-line no-param-reassign
     Vue.prototype.$songs = database.songs;
 
     // Redirect to installation page if not ready
     (await needsInstall(database.songs)) && router.push('/install');
+
+    // Check if serviceWorker is supported
+    if ('serviceWorker' in navigator) {
+        // Listen to messages
+        navigator.serviceWorker.addEventListener('message', event => {
+            if (event.data === 'reloadDatabase') {
+                // Close the database
+                database.close();
+
+                // Re-initialize the database
+                database = getDatabaseInstance();
+                // eslint-disable-next-line no-param-reassign
+                Vue.prototype.$songs = database.songs;
+
+                console.log("Database reloaded successfully.");
+            }
+        });
+    }
 }
