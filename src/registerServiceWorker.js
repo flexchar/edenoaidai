@@ -40,6 +40,10 @@ export default async () => {
                         }
                     });
                 });
+                // eslint-disable-next-line func-names
+                navigator.serviceWorker.oncontrollerchange = function () {
+                    window.location.reload();
+                };
             })
             .catch(err =>
                 Sentry
