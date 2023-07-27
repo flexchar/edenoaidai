@@ -36,7 +36,7 @@
                 </svg>
             </div>
             <div v-if="index !== undefined" class="audio-player">
-                <audio :ref="`audio-${index}`" preload="metadata" controls>
+                <audio :ref="`audio-${index}`" :key="`${getAudioSourceUrl(key)}-${index}`" preload="metadata" controls>
                     <source :src="getAudioSourceUrl(key)" type="audio/mpeg" @error="audioError">
                     Naršyklė nepalaiko audio elementų.
                 </audio>
@@ -60,14 +60,12 @@
         </div>
 
         <div class="song-image">
-            <template v-if="imageUrl1">
-                <img :src="imageUrl1" alt=""/>
-            </template>
-            <template v-if="imageUrl2">
-                <img :src="imageUrl2" alt=""/>
-            </template>
-            <template v-if="imageUrl3">
-                <img :src="imageUrl3" alt=""/>
+            <template v-for="(url, index) in imageUrls">
+                <div :key="'image-container-'+index">
+                    <div v-if="!imageLoaded[index]" class="image-loader"></div>
+                    <img v-if="!errorImages[index]" v-show="imageLoaded[index]" :src="url" alt="" @load="handleLoad(index)" @error="handleError(index)" />
+                    <!--                    <div v-if="errorImages[index]">Image failed to load.</div>-->
+                </div>
             </template>
         </div>
 
@@ -90,6 +88,9 @@ export default {
 
     data() {
         return {
+            imageLoaded: [false, false, false],
+            errorImages: [false, false, false],
+
             imageType: 'jpg',
             baseUrl: '',
 
@@ -113,14 +114,13 @@ export default {
                 fontSize: `${this.fontSize}px`,
             };
         },
-        imageUrl1() {
-            return `${this.baseUrl}${this.songId}.${this.imageType}`;
-        },
-        imageUrl2() {
-            return `${this.baseUrl}/${this.songId}_1.${this.imageType}`;
-        },
-        imageUrl3() {
-            return `${this.baseUrl}/${this.songId}_2.${this.imageType}`;
+
+        imageUrls() {
+            return [
+                `${this.baseUrl}${this.songId}.${this.imageType}`,
+                `${this.baseUrl}${this.songId}_1.${this.imageType}`,
+                `${this.baseUrl}${this.songId}_2.${this.imageType}`
+            ];
         },
 
         disablePreviousButton() {
@@ -131,6 +131,7 @@ export default {
             const currentIndex = this.songIds.indexOf(this.song.songId);
             return currentIndex <= 0;
         },
+
         disableNextButton() {
             // Check if song and songIds are not null or empty
             if (!this.song || !this.songIds.length) {
@@ -143,16 +144,28 @@ export default {
 
     watch: {
         '$route': 'fetchSong',
+
     },
 
     created() {
-        // this.baseUrl = `https://adventistai.lt/giesmes/notes/${this.imageType}/`;
         this.fetchSongs();
         this.fetchSong();
 
     },
 
     methods: {
+        handleLoad(index) {
+            this.$set(this.imageLoaded, index, true);
+        },
+
+        handleError(index) {
+            this.$set(this.imageLoaded, index, true);  // Mark it as loaded
+            this.$set(this.errorImages, index, true);  // Mark it as having an error
+            console.error(`Image at index ${index} failed to load.`);
+        },
+        imageError() {
+            this.error = true;
+        },
         updateImageType(type) {
             this.imageType = type;
             this.baseUrl = `https://adventistai.lt/giesmes/notes/${this.imageType}/`;
@@ -192,7 +205,6 @@ export default {
             if (currentIndex > 0) {
                 const previousSongId = this.songIds[currentIndex - 1];
                 this.$router.push(`/song/${previousSongId}`);
-                window.location.reload(); // Force reload the page
             }
         },
 
@@ -208,7 +220,6 @@ export default {
             if (currentIndex < this.songIds.length - 1) {
                 const nextSongId = this.songIds[currentIndex + 1];
                 this.$router.push(`/song/${nextSongId}`);
-                window.location.reload(); // Force reload the page
             }
         },
 
@@ -429,6 +440,33 @@ export default {
     .icon-audio {
         display: block;
         margin: 0 auto;
+    }
+    .image-loader {
+        display: inline-block;
+        position: relative;
+        width: 80px;
+        height: 80px;
+    }
+
+    .image-loader::after {
+        content: " ";
+        display: block;
+        width: 64px;
+        height: 64px;
+        margin: 8px;
+        border-radius: 50%;
+        border: 6px solid #000;
+        border-color: #000 transparent #000 transparent;
+        animation: image-loader 1.2s linear infinite;
+    }
+
+    @keyframes image-loader {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(360deg);
+        }
     }
 }
 </style>
