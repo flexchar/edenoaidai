@@ -1,7 +1,6 @@
 <template>
-    <div v-if="status === 'ready'" class="install-message">Paruošta!</div>
-    <div v-else class="install-message">
-        {{ message }}
+    <div v-if="status === 'ready'" class="install-message">classNamešta!</div>
+    <div v-else class="install-message">className {{ message }}
         {{ progress }}
         <div v-if="errorId">Klaidos kodas: {{ errorId }}</div>
     </div>
@@ -120,8 +119,9 @@ export default {
 
         success() {
             this.status = 'ready';
+            localStorage.setItem('databaseUpdated', 'false');
             setTimeout(() => this.$router.push('/'), 1000);
-        },
+        }
     }
 };
 </script>

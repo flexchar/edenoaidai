@@ -1,4 +1,4 @@
-/* global Sentry */
+/* global  */
 import { isBot } from './helpers/isBot';
 
 export default async () => {
@@ -18,7 +18,7 @@ export default async () => {
             console.info('Service worker successfully unregistered.');
         }
     } else {
-        const version = new Date().getTime(); // Use current timestamp as version
+        const version = process.env.CACHE_VERSION || '1'; // use cache version from env
         navigator.serviceWorker
             .register(`${window.location.origin}/service-worker.js?${version}`)
             .then((registration) => {
@@ -38,14 +38,19 @@ export default async () => {
                                 console.info('Content is cached for offline use.');
                             }
                         }
+
+                        // If the new service worker is activated, set the databaseUpdated flag to 'true'
+                        if (newWorker.state === 'activated') {
+                            localStorage.setItem('databaseUpdated', 'true');
+                            console.info('New service worker is active.');
+                        }
                     });
                 });
             })
             .catch(err =>
-                Sentry
-                    ? Sentry.captureException(err)
-                    : // eslint-disable-next-line no-console
-                    console.error(`Failed to register SW: `, err),
+                // eslint-disable-next-line no-console
+                console.error(`Failed to register SW: `, err),
             );
     }
 };
+

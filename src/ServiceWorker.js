@@ -7,7 +7,10 @@
 const { strategies, expiration, cacheableResponse } = workbox;
 
 // Use the CACHE_VERSION constant
-const CACHE_VERSION = 'v4';
+// eslint-disable-next-line no-restricted-globals
+const urlParams = new URL(location.href).searchParams;
+const CACHE_VERSION = urlParams.get('version') || 'v1';
+
 
 /**
  * Forcefully take over clients after update
@@ -124,8 +127,7 @@ self.addEventListener('activate', event => {
         caches.keys().then(cacheNames => {
             return Promise.all(
                 cacheNames.filter(cacheName => {
-                    // Check if the cache name starts with the old version prefix
-                    return cacheName.startsWith('default-') && !cacheName.includes(CACHE_VERSION);
+                    return cacheName.startsWith('json-') && !cacheName.includes(CACHE_VERSION);
                 }).map(cacheName => {
                     return caches.delete(cacheName);
                 })
