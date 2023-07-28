@@ -102,7 +102,7 @@ workbox.routing.setDefaultHandler({
  */
 workbox.routing.registerRoute(
     new RegExp('.json$'),
-    new strategies.CacheFirst({
+    new strategies.NetworkFirst({
         cacheName: `json-${CACHE_VERSION}`,
         plugins: [
             new cacheableResponse.Plugin({
