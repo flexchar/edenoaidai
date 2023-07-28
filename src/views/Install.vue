@@ -1,6 +1,7 @@
 <template>
-    <div v-if="status === 'ready'" class="install-message">classNamešta!</div>
-    <div v-else class="install-message">className {{ message }}
+    <div v-if="status === 'ready'" :class="'install-message'">Paruošta!</div>
+    <div v-else :class="'install-message'">
+        {{ message }}
         {{ progress }}
         <div v-if="errorId">Klaidos kodas: {{ errorId }}</div>
     </div>
@@ -25,54 +26,52 @@ export default {
         progress() {
             return `${this.current}/${this.total}`;
         },
-
     },
+
     async beforeMount() {
         try {
-            const songs = await this.fetchSongs();
-            const tracks = await this.fetchTracks();
-            if (await this.importSongs(songs, tracks)) {
-                this.success();
-            }
+            await this.fetchAndStoreData(this);
         } catch (error) {
             this.message = `Įvyko klaida: ${error.message}`;
         }
     },
 
     methods: {
+        async refreshData() {
+            try {
+                await this.$songs.clear();  // clear existing data before fetching and importing again
+                await this.fetchAndStoreData(this);
+            } catch (error) {
+                this.message = `Įvyko klaida: ${error.message}`;
+            }
+        },
 
+        async fetchAndStoreData(vm) {
+            const songs = await vm.fetchData(SONGS_JSON);
+            const tracks = await vm.fetchData(TRACKS_JSON);
+            if (await vm.importSongs(songs, tracks)) {
+                vm.success();
+            }
+        },
         /**
          * Fetches songs from JSON API
          *
          */
-        async fetchSongs() {
-            console.log(SONGS_JSON);
-            if (SONGS_JSON === null) {
+
+        async fetchData(url) {
+            if (!url) {
                 throw new Error('URL for database is missing.');
             }
 
             try {
-                const response = await fetch(SONGS_JSON);
-
+                // Add timestamp as a query parameter
+                const fullUrl = `${url}?${Date.now()}`;
+                const response = await fetch(fullUrl);
                 return await response.json();
             } catch (error) {
-                throw new Error(`Failed to fetch songs: ${error.message}`);
+                throw new Error(`Failed to fetch data: ${error.message}`);
             }
         },
-
-        async fetchTracks() {
-            if (TRACKS_JSON === null) {
-                throw new Error('URL for tracks database is missing.');
-            }
-
-            try {
-                const response = await fetch(TRACKS_JSON);
-                return await response.json();
-            } catch (error) {
-                throw new Error(`Failed to fetch tracks: ${error.message}`);
-            }
-        },
-
 
         /**
          * Load songs from array into browser database using Dexie API
@@ -82,23 +81,23 @@ export default {
          * @param {array} tracks Array of tracks
          */
         async importSongs(songs, tracks) {
+            this.$songs.clear();
             this.total = songs.length;
-            let status = false;
+            this.current = 0;  // reset current count before importing songs
+            let status = true;
 
-            songs.forEach(song => {
-                status = true;
+            try {
+                await Promise.all(songs.map(async (song) => {
+                    const {songId, title, verse, body, copyright} = song;
+                    const lists = [];
 
-                const {songId, title, verse, body, copyright} = song;
-                const lists = [];
+                    tracks.forEach(trackList => {
+                        if (trackList.tracks.includes(songId)) {
+                            lists.push(trackList.name);
+                        }
+                    });
 
-                tracks.forEach(trackList => {
-                    if (trackList.tracks.includes(songId)) {
-                        lists.push(trackList.name);
-                    }
-                });
-
-                this.$songs
-                    .put({
+                    const songObject = {
                         songId,
                         title,
                         verse,
@@ -106,13 +105,16 @@ export default {
                         copyright,
                         favorited: 0,
                         lists,
-                    })
-                    .catch(error => {
-                        status = false;
-                        console.error(error);
-                    });
+                    };
 
-            });
+                    await this.$songs.put(songObject);
+
+                    this.current += 1;
+                }));
+            } catch (error) {
+                status = false;
+                console.error(error);
+            }
 
             return status;
         },
@@ -122,7 +124,7 @@ export default {
             localStorage.setItem('databaseUpdated', 'false');
             setTimeout(() => this.$router.push('/'), 1000);
         }
-    }
+    },
 };
 </script>
 
